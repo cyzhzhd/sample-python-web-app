@@ -1,5 +1,5 @@
 # Copyright 2015. Amazon Web Services, Inc. All Rights Reserved.
-# 
+#
 # Permission is hereby granted, free of charge, to any person obtaining a copy of this
 # software and associated documentation files (the "Software"), to deal in the Software
 # without restriction, including without limitation the rights to use, copy, modify,
@@ -24,8 +24,10 @@ import boto3
 
 print("Configure the application")
 # Default config vals
-THEME = 'default' if os.environ.get('THEME') is None else os.environ.get('THEME')
-FLASK_DEBUG = 'false' if os.environ.get('FLASK_DEBUG') is None else os.environ.get('FLASK_DEBUG')
+THEME = 'default' if os.environ.get('THEME') is None else os.environ.get(
+    'THEME')
+FLASK_DEBUG = 'false' if os.environ.get(
+    'FLASK_DEBUG') is None else os.environ.get('FLASK_DEBUG')
 
 # Create the Flask app
 application = flask.Flask(__name__)
@@ -40,14 +42,17 @@ application.config.from_pyfile('application.config', silent=True)
 application.debug = application.config['FLASK_DEBUG'] in ['true', 'True']
 
 # Connect to DynamoDB and get refo to Table
-print("Connect to DynamoDB")
-ddb    = boto3.resource('dynamodb', region_name=application.config['AWS_REGION'])
+print("Connect to DynamoDB2")
+ddb = boto3.resource('dynamodb', region_name=application.config['AWS_REGION'])
 client = boto3.client('dynamodb', region_name=application.config['AWS_REGION'])
+
 
 @application.route('/')
 def welcome():
     theme = application.config['THEME']
-    return flask.render_template('index.html', theme=theme, flask_debug=application.debug)
+    return flask.render_template('index.html',
+                                 theme=theme,
+                                 flask_debug=application.debug)
 
 
 @application.route('/signup', methods=['POST'])
@@ -61,20 +66,20 @@ def signup():
     # except client.exceptions.ConditionalCheckFailedException:
     #     return Response("", status=409, mimetype='application/json')
 
-    return Response(json.dumps(signup_data), status=201, mimetype='application/json')
+    return Response(json.dumps(signup_data),
+                    status=201,
+                    mimetype='application/json')
 
 
 def store_in_dynamo(signup_data):
     table = ddb.Table(application.config['STARTUP_SIGNUP_TABLE'])
-    table.put_item(
-        Item=signup_data
-    )
+    table.put_item(Item=signup_data)
     print("PutItem succeeded:")
 
 
 # def create_table():
 #     ddb.create_table(
-#         TableName=application.config['STARTUP_SIGNUP_TABLE'], 
+#         TableName=application.config['STARTUP_SIGNUP_TABLE'],
 #         AttributeDefinitions=[
 #             {
 #                 'AttributeName': 'email',
@@ -86,10 +91,9 @@ def store_in_dynamo(signup_data):
 #                 'AttributeName': 'email',
 #                 'KeyType': 'HASH'
 #             }
-#         ], 
+#         ],
 #         BillingMode='PAY_PER_REQUEST'
 #     )
-
 
 # def init_db():
 #     try:
